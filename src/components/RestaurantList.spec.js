@@ -1,5 +1,7 @@
 import {render, screen} from '@testing-library/react';
-import RestaurantList from './RestaurantList';
+// Use the named export (not connected with the store)
+// In the prod. App then use the default export (which is connected with the store)
+import {RestaurantList} from './RestaurantList';
 
 describe('RestaurantList', () => {
   const restaurants = [
@@ -28,7 +30,6 @@ describe('RestaurantList', () => {
 
   it('displays the restaurants', () => {
     // Arrange
-    const noop = () => {};
     // Act
     renderComponent(); // Assert
     expect(screen.getByText('Sushi Place')).toBeInTheDocument();
