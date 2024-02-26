@@ -1,4 +1,4 @@
-import RestaurantScreen from './components/RestaurantScreen';
+import RestaurantScreen from './components/RestaurantScreen.js';
 
 function App() {
   return (
