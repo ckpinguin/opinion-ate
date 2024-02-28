@@ -48,10 +48,31 @@ describe('RestaurantList', () => {
     });
   });
 
-  it('displays the loading indicator while loading', () => {
-    // Arrange
-    renderComponent({loading: true});
-    // Assert
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  describe('when loading is successful', () => {
+    it('displays the loading indicator while loading', () => {
+      // Arrange
+      renderComponent({loading: true});
+      // Assert
+      expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    });
+    it('does not display the error message', () => {
+      // Arrange
+      renderComponent({loadError: false});
+      // Assert
+      expect(
+        screen.queryByText('Restaurants could not be loaded.'),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('when loading fails', () => {
+    it('displays an error message', () => {
+      // Arrange
+      renderComponent({loadError: true});
+      // Assert
+      expect(
+        screen.getByText('Restaurants could not be loaded.'),
+      ).toBeInTheDocument();
+    });
   });
 });
