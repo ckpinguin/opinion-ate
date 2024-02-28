@@ -10,13 +10,17 @@ describe('RestaurantList', () => {
   ];
   let loadRestaurants;
 
-  function renderComponent() {
-    render(
-      <RestaurantList
-        loadRestaurants={loadRestaurants}
-        restaurants={restaurants}
-      />,
-    );
+  // Make overrides of props possible (i.e. loading state etc.)
+  function renderComponent(propOverrides = {}) {
+    const props = {
+      loadRestaurants: jest.fn().mockName('loadRestaurants'),
+      // default restaurant or jest-mock could be easily overriden:
+      loading: false,
+      restaurants,
+      ...propOverrides,
+    };
+    loadRestaurants = props.loadRestaurants;
+    render(<RestaurantList {...props} />);
   }
 
   it('loads restaurants on first render', () => {
@@ -28,11 +32,26 @@ describe('RestaurantList', () => {
     expect(loadRestaurants).toHaveBeenCalled();
   });
 
-  it('displays the restaurants', () => {
+  describe('when loading succeeds', () => {
+    it('displays the restaurants', () => {
+      // Arrange
+      // Act
+      renderComponent(); // Assert
+      expect(screen.getByText('Sushi Place')).toBeInTheDocument();
+      expect(screen.getByText('Pizza Place')).toBeInTheDocument();
+    });
+    it('does not display the loading indicator when not loading', () => {
+      // Arrange
+      renderComponent();
+      // Assert
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+  });
+
+  it('displays the loading indicator while loading', () => {
     // Arrange
-    // Act
-    renderComponent(); // Assert
-    expect(screen.getByText('Sushi Place')).toBeInTheDocument();
-    expect(screen.getByText('Pizza Place')).toBeInTheDocument();
+    renderComponent({loading: true});
+    // Assert
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 });
