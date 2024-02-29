@@ -1,7 +1,7 @@
 import restaurantsReducer from './restaurants/reducers';
 import {createStore, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
-import {loadRestaurants} from './restaurants/actions';
+import {loadRestaurants, createRestaurant} from './restaurants/actions';
 
 describe('restaurants', () => {
   describe('initially', () => {
@@ -57,6 +57,58 @@ describe('restaurants', () => {
       });
       it('clears the loading flag', () => {
         expect(store.getState().loading).toEqual(false);
+      });
+    });
+
+    describe('createRestaurant action', () => {
+      // Arrange
+      const newRestaurantName = 'Sushi Place';
+      const existingRestaurant = {id: 1, name: 'Pizza Place'};
+      const responseRestaurant = {id: 2, name: newRestaurantName};
+
+      let api;
+      let store;
+
+      beforeEach(() => {
+        api = {createRestaurant: jest.fn().mockName('createRestaurant')};
+
+        const initialState = {records: [existingRestaurant]};
+
+        store = createStore(
+          restaurantsReducer,
+          initialState,
+          applyMiddleware(thunk.withExtraArgument(api)),
+        );
+      });
+
+      it('saves the restaurant to the server', () => {
+        // Act
+        store.dispatch(createRestaurant(newRestaurantName));
+
+        // Assert
+        expect(api.createRestaurant).toHaveBeenCalledWith(newRestaurantName);
+      });
+
+      describe('when save succeeds', () => {
+        beforeEach(() => {
+          api.createRestaurant.mockResolvedValue(responseRestaurant);
+          return store.dispatch(createRestaurant(newRestaurantName));
+        });
+
+        it('stores the returned restaurant in the store', () => {
+          expect(store.getState().records).toEqual([
+            existingRestaurant,
+            responseRestaurant,
+          ]);
+        });
+
+        describe('when save fails', () => {
+          it('rejects', () => {
+            api.createRestaurant.mockRejectedValue();
+            const promise = store.dispatch(createRestaurant(newRestaurantName));
+            return expect(promise).rejects.toBeUndefined();
+          });
+        });
       });
     });
 
