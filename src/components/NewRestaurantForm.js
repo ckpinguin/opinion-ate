@@ -1,11 +1,15 @@
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-export function NewRestaurantForm() {
+export function NewRestaurantForm({createRestaurant}) {
   return (
-    <form>
+    <form
+      onSubmit={() => {
+        createRestaurant();
+      }}
+    >
       <TextField placeholder="Add Restaurant" fullWidth variant="filled" />
-      <Button variant="contained" color="primary">
+      <Button type="submit" variant="contained" color="primary">
         Add
       </Button>
     </form>
